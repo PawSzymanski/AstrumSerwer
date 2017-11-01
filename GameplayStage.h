@@ -11,8 +11,9 @@
 #include "engine_system.h"
 #include "sliding_doors_system.h"
 #include "platform_manager.h"
+#include "Conversion.h"
 
-class GamePlayStage : public SerwerStage
+class GamePlayStage : public SerwerStage//, public entityx::System<GamePlayStage>
 {
 	const float dt = 0.01;
 	sf::Clock clock;
@@ -20,12 +21,21 @@ class GamePlayStage : public SerwerStage
 	std::shared_ptr<entityx::EntityX> ex_ptr;
 	std::shared_ptr<Phisics_2D> phisics_ptr;
 	bool isInit;
+	bool LoadPart(ResourcesManager::UniquePlayer player);
 public:
 	GamePlayStage();
+	bool init(std::string &);
 	bool isWaitingForPlayers;
+
+	//void update(entityx::EntityManager & en, entityx::EventManager & ev, double dt);
+
 	std::vector<ResourcesManager::UniquePlayer> player;
 	bool waitingForPlayers(std::string &str);
-	bool init();
+	bool decodeDataFromClient(std::string & str);
+	bool collectDataToSend(std::string & str);
+	bool addVelocity(unsigned int playersId, std::string & bufferStr);
+	bool updatePartsAction(unsigned int playersId, std::string & bufferStr);
+	
 	bool isFull();
 	
 	bool update(std::string &);

@@ -11,7 +11,6 @@
 
 class CollisionSystem : public entityx::System<CollisionSystem>
 {
-
 	sf::Vector2f &gravity;
 public:
 	void(*dispatch[2][2])(Manifold& m);

@@ -1,13 +1,13 @@
 #pragma once
 #include "LibsAndDeclarations.h"
 
-//#include "GameplayStage.h"
-#include "configparser.h"
-
-
+#include "ContainerOfParts.h"
+#include "configparser.h"\
 
 //#include "2d_phisLIB/Container.h"
 //#include "configparser.h"
+
+
 /*
 *We keep here data that can be transefed 
 * or visible to any class or function in whole code.
@@ -52,24 +52,28 @@ public:
 		}
 		bool isAdmin;
 		unsigned int uniqueId, session;
+		unsigned short port;
 		sf::IpAddress ip;
 		std::string name, bodyName;
-		std::map <std::string, bool> actionKeys;
-		Container parts;
+		//std::map <std::string, bool> actionKeys;
+		ContainerOfParts parts;
 	};
 
 public:
+	bool areAllPlatfIncluded, areAllCargoSpaceIncluded, isMouseButtonReleased, isGameOver, isPauseTime, isMovingCameraOn;
+	unsigned int temporaryId;
+	
 	std::vector< UniquePlayer> uniquePlayers;
-	//std::vector<GamePlayStage> GamePlaySt;
+	
  	std::string decodeOneLineDel(std::string & array);
 	std::string decodeOneLineRead(std::string  array);
-	bool areAllPlatfIncluded, areAllCargoSpaceIncluded, isMouseButtonReleased, isGameOver, isPauseTime, isMovingCameraOn;
-	sf::View camera;
 	std::string levelInfo;
 	std::string shipInfo;
+	
+	sf::View camera;
+	
 	Container vertCont;
-	//Container vertCont;
-	//Container textureCont;
+
     sf::Font font;
 	sf::RenderWindow window;
 	//stages

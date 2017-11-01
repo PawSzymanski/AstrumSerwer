@@ -12,7 +12,7 @@ ResourcesManager::ResourcesManager() :  levelInfo("resources/levelData/level_4.c
 ResourcesManager::~ResourcesManager()
 {
 }
-
+//decodes first part of buffer and delets it
 std::string ResourcesManager::decodeOneLineDel(std::string &array)
 {
 	std::string message;
@@ -24,6 +24,7 @@ std::string ResourcesManager::decodeOneLineDel(std::string &array)
 	array.erase(0, 1);
 	return message;
 }
+//decodes first part of buffer 
 std::string ResourcesManager::decodeOneLineRead(std::string array)
 {
 	int i = 0;

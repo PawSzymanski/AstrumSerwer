@@ -177,6 +177,7 @@
     <ClCompile Include="2d_phisLIB\systems\MovementSystem.cpp" />
     <ClCompile Include="cargosystem.cpp" />
     <ClCompile Include="configparser.cpp" />
+    <ClCompile Include="ContainerOfParts.cpp" />
     <ClCompile Include="cranesystem.cpp" />
     <ClCompile Include="destructionsystem.cpp" />
     <ClCompile Include="enemy_system.cpp" />
@@ -206,6 +207,8 @@
     <ClInclude Include="2d_phisLIB\systems\MovementSystem.h" />
     <ClInclude Include="cargosystem.h" />
     <ClInclude Include="configparser.h" />
+    <ClInclude Include="ContainerOfParts.h" />
+    <ClInclude Include="Conversion.h" />
     <ClInclude Include="cranesystem.h" />
     <ClInclude Include="destructionsystem.h" />
     <ClInclude Include="enemy_system.h" />

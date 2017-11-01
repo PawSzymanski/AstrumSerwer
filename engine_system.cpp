@@ -1,6 +1,8 @@
 #include "engine_system.h"
 #include "ResourceManager.h"
-
+/*
+THIS FILE IS MODIFIED FOR MULTIPLAYER NEEDS
+*/
 
 engine_system::engine_system(entityx::EventManager &ev, Phisics_2D &phs) : phisics(phs)
 {
@@ -9,6 +11,7 @@ engine_system::engine_system(entityx::EventManager &ev, Phisics_2D &phs) : phisi
 
 void engine_system::update(entityx::EntityManager & en, entityx::EventManager & ev, double dt)
 {
+	auto &resource = ResourcesManager::getInstanceRef();
 	isPlayer::Handle playerH;
 	VertexArray::Handle verH;
 	//Line::Handle lineH;
@@ -17,12 +20,20 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 	
 	AttachToPlayerPoint::Handle attachPointH;
 	Transform::Handle transEngH, transPlayerH;
+	PartInfo::Handle partInfH;
 	//isLegs::Handle legsH;
+
 
 	for (auto en1 : en.entities_with_components(posH, playerH, rotH))
 	{
-		for (auto en2 : en.entities_with_components(verH, transEngH, attachPointH))
+		if (playerH->id != resource.temporaryId)
+			continue;
+
+		for (auto en2 : en.entities_with_components(verH, transEngH, attachPointH, partInfH))
 		{
+			if (playerH->id != partInfH->playerId)
+				continue;
+
 			rotH = en1.component<Rotation>();
 			posH = en1.component<Position>();
 
@@ -47,7 +58,7 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 
 			//parts functions///////////////////////////////////////////////////////////////////////////
 			
-			enginePart(en1, en2, ev, attachPointH, rotMatrix);
+			enginePart(en1, en2, ev, attachPointH, rotMatrix, partInfH);
 			gunPart(en, en1, en2, ev, attachPointH, rotMatrix, rotEngH->degree);
 
 			//end;/////////////////////////////////////////////////////////////////////////////////////////
@@ -57,8 +68,9 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 }
 
 void engine_system::enginePart(entityx::Entity enPlayer, entityx::Entity enPart, 
-	entityx::EventManager & ev, AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix)
+	entityx::EventManager & ev, AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix, PartInfo::Handle partInfH)
 {
+	auto & resource = ResourcesManager::getInstanceRef();
 	if (!enPart.has_component<isEngine>())
 	{
 		return;
@@ -72,9 +84,8 @@ void engine_system::enginePart(entityx::Entity enPlayer, entityx::Entity enPart,
 
 	pointH->force = rotMatrix * pointH->force;
 
-	if (sf::Keyboard::isKeyPressed(keyH->key))
-	{
-		auto & resource = ResourcesManager::getInstanceRef();
+	if (partInfH->isActive)
+	{	
 		ev.emit<ApplyForceEvent>(attachPointH->point, pointH->force, enPlayer);
 		
 		if (!enPart.has_component<AdditionalAnim>())

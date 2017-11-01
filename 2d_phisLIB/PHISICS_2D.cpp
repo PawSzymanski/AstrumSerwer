@@ -20,9 +20,7 @@ void Phisics_2D::update(float dt)
     ex.systems.update<CollisionSystem>(dt);
     ex.systems.update<JointSystem>(dt);
 }
-/*
-*
-*/
+
 void Phisics_2D::createCircle(entityx::Entity en, sf::Vector2f pos, sf::Vector2f vel, float mass, sf::Color col, float r)
 {
     en.assign<Position>(pos);
@@ -40,9 +38,11 @@ void Phisics_2D::createCircle(entityx::Entity en, sf::Vector2f pos, sf::Vector2f
     en.assign<Type>(Type::CIRCLE);
     en.assign<IsResting>();
 }
+
 /*
 *en, pos, vel, rot, mass, polyindex
 */
+
 void Phisics_2D::createPolygon(entityx::Entity en, sf::Vector2f pos,sf::Vector2f vel, float rotation, float mass, const std::string & polyName)
 {
     en.assign<Rotation>(rotation);

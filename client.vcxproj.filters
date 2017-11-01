@@ -19,24 +19,12 @@
     <Filter Include="Source Files\gameplay">
       <UniqueIdentifier>{ebed063d-96c3-4029-b61e-f547944f069c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\stages">
+      <UniqueIdentifier>{85c8affe-6dd8-4aef-9f78-1086a47c3863}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SerwerStage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoginStage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameplayStage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sewer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadingDataStage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="configparser.cpp">
@@ -92,6 +80,24 @@
     </ClCompile>
     <ClCompile Include="sliding_doors_system.cpp">
       <Filter>Source Files\gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="GameplayStage.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadingDataStage.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="SerwerStage.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="sewer.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="LoginStage.cpp">
+      <Filter>Source Files\stages</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerOfParts.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +180,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="platform_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerOfParts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Conversion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

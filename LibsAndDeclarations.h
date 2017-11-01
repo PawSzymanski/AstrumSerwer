@@ -14,7 +14,6 @@
 
 #include "2d_phisLIB/phisics_2d.h"
 
-
 #include "mysql_connection.h"
 #include "mysql_driver.h"
 #include "mysql_connection.h"

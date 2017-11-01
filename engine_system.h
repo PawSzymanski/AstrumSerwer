@@ -9,7 +9,8 @@ class engine_system : public entityx::System<engine_system>, public entityx::Rec
 	sf::Clock bulletClock;
 	sf::Time bulletTime;
 
-	void enginePart(entityx::Entity enPlayer, entityx::Entity enPart, entityx::EventManager & ev, AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix);
+	void enginePart(entityx::Entity enPlayer, entityx::Entity enPart, entityx::EventManager & ev,
+		AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix, PartInfo::Handle partInfH);
 	void gunPart(entityx::EntityManager & en, entityx::Entity enPlayer, entityx::Entity enPart, entityx::EventManager & ev,
 				AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix, float);
 public:

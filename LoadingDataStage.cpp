@@ -24,7 +24,6 @@ int LoadingDataStage::assignToSession(ResourcesManager::UniquePlayer &unPlayer)
 
 		if (session.isFull())
 		{
-			
 			std::cout << std::endl;
 			std::cout << "isFull:" << i << std::endl;
 			++i;
@@ -84,7 +83,6 @@ void LoadingDataStage::loadPlayer(std::string &bufferStr, ResourcesManager::Uniq
 				player.parts.addPart(name, pos, degree, unId);
 				std::cout << "acual buffer3      :" << bufferStr << std::endl;
 			}
-			
 		}
 		std::cout << "acual buffer at end     :" << bufferStr << std::endl;
 	}
@@ -93,8 +91,6 @@ void LoadingDataStage::loadPlayer(std::string &bufferStr, ResourcesManager::Uniq
 
 bool LoadingDataStage::waitingForPlayers(std::string &str)
 {
-
-
 	return false;
 }
 

@@ -40,8 +40,7 @@ bool LoginStage::receiveDataFromClient(std::string &bufferStr)
 	std::cout << "buffer:" << bufferStr << std::endl;//"login:" << bufferLogin << "pass:" << bufferPass << std::endl;
 
 	//Decoding buffer
-	
-		//type of action
+		port = stoi(resource.decodeOneLineDel(bufferStr));
 		clientIp = resource.decodeOneLineDel(bufferStr);
 		loginStr = resource.decodeOneLineDel(bufferStr);
 		passStr = resource.decodeOneLineDel(bufferStr);
@@ -53,6 +52,7 @@ bool LoginStage::receiveDataFromClient(std::string &bufferStr)
 		unsigned int unNum = giveUniqueNum();
 		
 		ResourcesManager::UniquePlayer player(unNum, clientIp);
+		player.port = port;
 		ResourcesManager::getInstanceRef().uniquePlayers.push_back(player);
 		
 		bufferStr = "2;" +

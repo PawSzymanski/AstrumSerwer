@@ -178,7 +178,15 @@ struct KeyAssigned : public entityx::Component<KeyAssigned>
 };
 //
 struct isPlayer : public entityx::Component<isPlayer>
-{};
+{
+	isPlayer() : id(0)
+	{
+	}
+	isPlayer(unsigned int i) : id(i)
+	{
+	}
+	unsigned int id;
+};
 
 struct isEngine : public entityx::Component<isEngine>
 {};
@@ -209,7 +217,6 @@ struct isSlidingDoors : public entityx::Component<isSlidingDoors>
 		id.push_back(i);
 	}
 };
-
 
 struct isBullet : public entityx::Component<isBullet>
 {
@@ -305,4 +312,13 @@ struct CargoSpace : public entityx::Component<CargoSpace>
     bool checked;
 };
 
+struct PartInfo : public entityx::Component<PartInfo>
+{
+	PartInfo(unsigned int playerId, unsigned int partId) : playerId(playerId), partId(partId), isActive(false)
+	{
+
+	}
+	bool isActive;
+	unsigned int playerId, partId;
+};
 
