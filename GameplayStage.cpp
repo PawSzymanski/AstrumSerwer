@@ -30,7 +30,7 @@ bool GamePlayStage::init(std::string &str)
 
 	//loading players
 	int xPos = 1;
-	str = str + "1;"; //action code
+	str = str + "#1;"; //action code
 	for (auto &p : player)
 	{
 		++xPos;
@@ -54,7 +54,12 @@ bool GamePlayStage::init(std::string &str)
 		playerEn.assign<isPlayer>(p.uniqueId);
 		(*phisics_ptr).createPolygon(playerEn, sf::Vector2f(xPos, 8),
 			sf::Vector2f(0, 0), 0, 1, typeOfShip);
+
+
+		//
 		str = str + std::to_string(p.uniqueId) + ";" + typeOfShip + ";" + std::to_string(xPos) + ";8; " + "0;";
+		//
+
 
 		//PARTS
 		std::string partName, partKey, pathToPart, partColor, partVert;
@@ -167,6 +172,7 @@ bool GamePlayStage::waitingForPlayers(std::string & str)
 	if (isFull())
 	{
 		init(str);
+		isWaitingForPlayers = false;
 		return false;
 	}
 	else
@@ -178,11 +184,22 @@ bool GamePlayStage::waitingForPlayers(std::string & str)
 bool GamePlayStage::decodeDataFromClient(std::string &str)
 {
 
-	return true;
 }
+//tldr -> sending position of players;
 bool GamePlayStage::collectDataToSend(std::string &str)
 {
-
+	auto &resource = ResourcesManager::getInstanceRef();
+	Position::Handle posH;
+	Rotation::Handle rotH;
+	isPlayer::Handle isPlayerH;
+	str = str + "#2;";
+	std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
+	for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH))
+	{
+		std::cout << "data collecting" << std::endl;
+		str = str + std::to_string(isPlayerH->id) + ";" + std::to_string(posH->pos.x) + ";" + std::to_string(posH->pos.y) + ";" + std::to_string(rotH->degree) + ";";
+	}
+	str = str + ";"; // to make ";;" (end of call)
 	return true;
 }
 bool GamePlayStage::addVelocity(unsigned int playersId, std::string & bufferStr)
@@ -228,28 +245,32 @@ bool GamePlayStage::updatePartsAction(unsigned int playersId, std::string & buff
 bool GamePlayStage::update(std::string &buffer)
 {
 	//here messsage must look like this :
-	//player id; action code; do sth
+	//player id; action code; do sth;;
 	time = sf::Time::Zero;
 	time += clock.restart();
 	auto &resource = ResourcesManager::getInstanceRef();
+
+	std::cout << "dt:" << dt << "time:" << time.asMilliseconds() <<"buffer:" << buffer <<std::endl;
+	int playersId = stoi(resource.decodeOneLineDel(buffer));
+
 	if (time.asSeconds() >= dt && isWaitingForPlayers == false)
 	{
-
-		int playersId = stoi(resource.decodeOneLineDel(buffer)),
-			actionCode = -1;
+		std::cout << "serwer update!" << std::endl;
+		std::string actionCode = "-1";
 
 		resource.temporaryId = playersId;
 			
-		while(actionCode != 0)
+		while(actionCode != "0")
 			{
-				actionCode = stoi(resource.decodeOneLineRead(buffer) != "" ? resource.decodeOneLineDel(buffer) : "0");
+			std::cout <<"buffer:" << buffer << std::endl;
+				actionCode = resource.decodeOneLineRead(buffer) != "" ? resource.decodeOneLineDel(buffer) : "0";
 				//
-				if (actionCode == 21)
+				if (actionCode == "#1")
 				{
 					addVelocity(playersId, buffer);
 				}
 				//
-				else if (actionCode == 22)
+				else if (actionCode == "#2")
 				{
 					updatePartsAction(playersId, buffer);
 				}
@@ -268,7 +289,7 @@ bool GamePlayStage::update(std::string &buffer)
 
 		collectDataToSend(buffer);
 		//
-		//time -= sf::seconds(dt);
+		time -= sf::seconds(dt);
 	}
 
 	return true;

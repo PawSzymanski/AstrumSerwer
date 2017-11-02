@@ -30,7 +30,7 @@ int main()
 	auto & resource = ResourcesManager::getInstanceRef();
 	int actionCode = 0;
 	socket.bind(portRec); //REMEMBER THAT WE BIND ONLY LISTENER 
-	
+	//ACSESS CODE TO SERWER IS:5555
 
 	while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
@@ -41,18 +41,16 @@ int main()
 		//Numbers of action from 3 and further are session numbers
 		//std::cout << std::endl;
 		//std::cout << "Waiting for message..." << std::endl;
-
 		socket.receive(buffer, sizeof(buffer), received, sender, portRec);
 	
-		std::cout << "received mess:" << buffer << std::endl;
-
 		std::string bufferStr = buffer;
 		
-		std::string tester = resource.decodeOneLineRead(bufferStr);
-		std::cout << "received test:" << tester << std::endl;
-		if (bufferStr.size() < 2 || sender.toString() == "0.0.0.0" || tester[0] > 39 || tester[0] < 30)
+		std::string tester = resource.decodeOneLineDel(bufferStr);
+		//std::cout << "received test:" << (int)tester[0] << std::endl;
+		if (tester != "5555" || bufferStr.size() < 2 || sender.toString() == "0.0.0.0" ) //safety features
 			continue;
-
+		std::cout << "received mess:" << bufferStr << std::endl;
+		system("pause");
 		actionCode = stoi( resource.decodeOneLineDel(bufferStr) );
 		//We will need to search for port to send message
 		portToSendOrID = stoi(resource.decodeOneLineRead(bufferStr));
@@ -66,7 +64,8 @@ int main()
 
 			serwer->update(bufferStr);
 			// Send an answer
-			//std::cout << "sending last message...  :" << bufferStr << std::endl << "port:" << portToSendOrID << "sender:" << sender.toString() << ";" << std::endl;
+			//bufferStr = "5555;" + bufferStr;
+			std::cout << "-1sending last message...:" << bufferStr << std::endl << "port:" << portToSendOrID << "sender:" << sender.toString() << ";" << std::endl;
 			socketSend.send(bufferStr.c_str(), bufferStr.size(), sender, portToSendOrID);
 		}
 		else if (actionCode == 2)
@@ -78,7 +77,8 @@ int main()
 				//std::cout << player.uniqueId << " " << portToSendOrID << std::endl;
 				if (player.uniqueId == portToSendOrID)
 				{
-					//std::cout << "sending last message...  :" << bufferStr << std::endl << "port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
+					bufferStr = "5555;" + bufferStr;
+					std::cout << "0sending last message...  :" << bufferStr << std::endl << "port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
 					socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, player.port);
 					continue;
 				}
@@ -91,14 +91,17 @@ int main()
 			std::cout << "is waiting fo player?" << bufferStr <<std::endl;
 			if (!serwer->waitingForPlayers(bufferStr))
 			{
+				std::cout << std::endl;
 				std::cout << "no wait" << std::endl;
+				std::cout << std::endl;
 				for (auto player : resource.uniquePlayers)
 					if (player.uniqueId == portToSendOrID)
 					{
-						bufferStr = std::to_string(actionCode) + ";" + bufferStr;
-						//std::cout << "sending last message...  :" << bufferStr  << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
+						serwer->update(bufferStr);
+						bufferStr = "5555;" + std::to_string(actionCode) + ";" + std::to_string(portToSendOrID) + ";" + bufferStr;
+						std::cout << "1sending last message...  :" << bufferStr  << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
 						unsigned short poooort = player.port;
-						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, poooort);
+						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, player.port);
 						continue;
 					}
 				
@@ -107,10 +110,22 @@ int main()
 				for (auto player : resource.uniquePlayers)
 					if (player.uniqueId == portToSendOrID)
 					{
-						bufferStr = std::to_string(actionCode) + ";" + std::to_string(portToSendOrID) + ";";
+						
+						bufferStr = "5555;" + std::to_string(actionCode) + ";" + bufferStr;//no variable " portToSendOrID " because of that tha it is not deleted anywhere
 						unsigned short poooort = player.port;
-						//std::cout << "sending last message...  :" << bufferStr << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
-						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, poooort);
+						std::cout << "2sending last message...  :" << bufferStr << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
+						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, player.port);
+						/*socket.unbind();
+						socket.bind(22222);
+						char b[100];
+						std::string ippp;
+						std::cout << "mess" << b << std::endl;
+						socket.receive(b, sizeof(b), received, sender, portRec);
+						std::cout << "mess" << b << std::endl;
+						socket.unbind();
+						socket.bind(portRec);*/
+						std::cout << "mess:" << bufferStr << std::endl;
+						std::cout << "port after:" << player.port << std::endl;
 					}
 			}
 		}
