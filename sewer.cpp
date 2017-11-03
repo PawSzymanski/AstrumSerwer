@@ -30,17 +30,19 @@ int main()
 	auto & resource = ResourcesManager::getInstanceRef();
 	int actionCode = 0;
 	socket.bind(portRec); //REMEMBER THAT WE BIND ONLY LISTENER 
-	//ACSESS CODE TO SERWER IS:5555
+	
+						//ACSESS CODE TO SERWER IS:5555
 
 	while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
 		//serwer.reset();
-		//HOW MESSAGE LOOKS LIKE
-		//number of action; id of player; ...
-		//Number of action 1 is login stage, 2 is loading stage
-		//Numbers of action from 3 and further are session numbers
-		//std::cout << std::endl;
-		//std::cout << "Waiting for message..." << std::endl;
+		//	HOW MESSAGE LOOKS LIKE
+		//	number of action; id of player; ...
+		//	Number of action 1 is login stage, 2 is loading stage
+		//	Numbers of action from 3 and further are session numbers
+		//	std::cout << std::endl;
+		//	std::cout << "Waiting for message..." << std::endl;
+
 		socket.receive(buffer, sizeof(buffer), received, sender, portRec);
 	
 		std::string bufferStr = buffer;
@@ -50,7 +52,6 @@ int main()
 		if (tester != "5555" || bufferStr.size() < 2 || sender.toString() == "0.0.0.0" ) //safety features
 			continue;
 		std::cout << "received mess:" << bufferStr << std::endl;
-		system("pause");
 		actionCode = stoi( resource.decodeOneLineDel(bufferStr) );
 		//We will need to search for port to send message
 		portToSendOrID = stoi(resource.decodeOneLineRead(bufferStr));
@@ -88,12 +89,12 @@ int main()
 		else if (actionCode > 2 && actionCode < 30)
 		{
 			serwer = &gamePlaySt[actionCode - 3];//std::make_shared<GamePlayStage>(gamePlaySt);//actionCode - 3]);
-			std::cout << "is waiting fo player?" << bufferStr <<std::endl;
+			//std::cout << "is waiting fo player?" << bufferStr <<std::endl;
 			if (!serwer->waitingForPlayers(bufferStr))
 			{
-				std::cout << std::endl;
-				std::cout << "no wait" << std::endl;
-				std::cout << std::endl;
+				//std::cout << std::endl;
+				//std::cout << "no wait" << std::endl;
+				//std::cout << std::endl;
 				for (auto player : resource.uniquePlayers)
 					if (player.uniqueId == portToSendOrID)
 					{
@@ -102,6 +103,7 @@ int main()
 						std::cout << "1sending last message...  :" << bufferStr  << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
 						unsigned short poooort = player.port;
 						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, player.port);
+						system("pause");
 						continue;
 					}
 				
@@ -128,6 +130,7 @@ int main()
 						std::cout << "port after:" << player.port << std::endl;
 					}
 			}
+			//system("pause");
 		}
 
 	}

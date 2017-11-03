@@ -144,8 +144,10 @@ bool GamePlayStage::init(std::string &str)
 			partEn.assign<Transform>(sf::Vector2f(0, 0), 0);
 			partEn.assign<LinearVelocity>(sf::Vector2f(0, 0));
 		}
+		std::cout << "init" << std::endl;
 	}
 	str = str + ";";
+	std::cout << "init" << std::endl;
 	isInit = true;
 }
 
@@ -169,11 +171,15 @@ bool GamePlayStage::isFull()
 
 bool GamePlayStage::waitingForPlayers(std::string & str)
 {
-	if (isFull())
+	if (!isWaitingForPlayers)
+	{
+		return false;
+	}
+	else if (isFull())
 	{
 		init(str);
 		isWaitingForPlayers = false;
-		return false;
+		return true;
 	}
 	else
 	{
@@ -193,10 +199,10 @@ bool GamePlayStage::collectDataToSend(std::string &str)
 	Rotation::Handle rotH;
 	isPlayer::Handle isPlayerH;
 	str = str + "#2;";
-	std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
+	//std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
 	for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH))
 	{
-		std::cout << "data collecting" << std::endl;
+		//std::cout << "data collecting" << std::endl;
 		str = str + std::to_string(isPlayerH->id) + ";" + std::to_string(posH->pos.x) + ";" + std::to_string(posH->pos.y) + ";" + std::to_string(rotH->degree) + ";";
 	}
 	str = str + ";"; // to make ";;" (end of call)
@@ -237,8 +243,6 @@ bool GamePlayStage::updatePartsAction(unsigned int playersId, std::string & buff
 
 		}
 	}
-
-	(*ex_ptr).systems.update<engine_system>(dt);
 	return true;
 }
 
@@ -246,23 +250,23 @@ bool GamePlayStage::update(std::string &buffer)
 {
 	//here messsage must look like this :
 	//player id; action code; do sth;;
-	time = sf::Time::Zero;
+	
 	time += clock.restart();
 	auto &resource = ResourcesManager::getInstanceRef();
 
-	std::cout << "dt:" << dt << "time:" << time.asMilliseconds() <<"buffer:" << buffer <<std::endl;
+	//std::cout << "dt:" << dt << "time:" << time.asMilliseconds() <<"buffer:" << buffer <<std::endl;
 	int playersId = stoi(resource.decodeOneLineDel(buffer));
 
 	if (time.asSeconds() >= dt && isWaitingForPlayers == false)
 	{
-		std::cout << "serwer update!" << std::endl;
+		//std::cout << "serwer update!" << std::endl;
 		std::string actionCode = "-1";
 
 		resource.temporaryId = playersId;
 			
 		while(actionCode != "0")
 			{
-			std::cout <<"buffer:" << buffer << std::endl;
+			//std::cout <<"buffer:" << buffer << std::endl;
 				actionCode = resource.decodeOneLineRead(buffer) != "" ? resource.decodeOneLineDel(buffer) : "0";
 				//
 				if (actionCode == "#1")
