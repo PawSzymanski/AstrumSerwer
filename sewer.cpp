@@ -32,7 +32,7 @@ int main()
 	socket.bind(portRec); //REMEMBER THAT WE BIND ONLY LISTENER 
 	
 						//ACSESS CODE TO SERWER IS:5555
-
+	sf::Time MYTIME = sf::Time::Zero;
 	while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
 		//serwer.reset();
@@ -42,16 +42,17 @@ int main()
 		//	Numbers of action from 3 and further are session numbers
 		//	std::cout << std::endl;
 		//	std::cout << "Waiting for message..." << std::endl;
-
+		sf::Clock clk;
 		socket.receive(buffer, sizeof(buffer), received, sender, portRec);
-	
+		clk.restart();
+		MYTIME = sf::Time::Zero;
 		std::string bufferStr = buffer;
 		
 		std::string tester = resource.decodeOneLineDel(bufferStr);
 		//std::cout << "received test:" << (int)tester[0] << std::endl;
 		if (tester != "5555" || bufferStr.size() < 2 || sender.toString() == "0.0.0.0" ) //safety features
 			continue;
-		std::cout << "received mess:" << bufferStr << std::endl;
+		//std::cout << "received mess:" << bufferStr << std::endl;
 		actionCode = stoi( resource.decodeOneLineDel(bufferStr) );
 		//We will need to search for port to send message
 		portToSendOrID = stoi(resource.decodeOneLineRead(bufferStr));
@@ -100,10 +101,10 @@ int main()
 					{
 						serwer->update(bufferStr);
 						bufferStr = "5555;" + std::to_string(actionCode) + ";" + std::to_string(portToSendOrID) + ";" + bufferStr;
-						std::cout << "1sending last message...  :" << bufferStr  << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
+						//std::cout << "1sending last message...  :" << bufferStr  << " port:" << player.port << "sender:" << sender.toString() << ";" << std::endl;
 						unsigned short poooort = player.port;
 						socketSend.send(bufferStr.c_str(), bufferStr.size() + 1, sender, player.port);
-						system("pause");
+						//system("pause");
 						continue;
 					}
 				
@@ -126,13 +127,14 @@ int main()
 						std::cout << "mess" << b << std::endl;
 						socket.unbind();
 						socket.bind(portRec);*/
-						std::cout << "mess:" << bufferStr << std::endl;
-						std::cout << "port after:" << player.port << std::endl;
+						//std::cout << "mess:" << bufferStr << std::endl;
+						//std::cout << "port after:" << player.port << std::endl;
 					}
 			}
 			//system("pause");
 		}
-
+		MYTIME = clk.restart();
+		std::cout << "time elapsed in one loop:" << MYTIME.asMilliseconds() << std::endl;
 	}
 
 	

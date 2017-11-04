@@ -94,8 +94,8 @@ void engine_system::enginePart(entityx::Entity enPlayer, entityx::Entity enPart,
 		}
 		else
 		{
-			animH = enPart.component<AdditionalAnim>();
-			animH->animate = true;
+		//	animH = enPart.component<AdditionalAnim>();
+		//	animH->animate = true;
 		}
 	}
 	else if (enPart.has_component<AdditionalAnim>())

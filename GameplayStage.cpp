@@ -30,10 +30,10 @@ bool GamePlayStage::init(std::string &str)
 
 	//loading players
 	int xPos = 1;
-	str = str + "#1;"; //action code
+	str = str + "$1;"; //action code
 	for (auto &p : player)
 	{
-		++xPos;
+		xPos += 2;
 		std::string typeOfShip, shipColor;
 		float actualEngineForce;
 
@@ -149,6 +149,7 @@ bool GamePlayStage::init(std::string &str)
 	str = str + ";";
 	std::cout << "init" << std::endl;
 	isInit = true;
+	system("pause");
 }
 
 bool GamePlayStage::LoadPart(ResourcesManager::UniquePlayer player)
@@ -198,11 +199,14 @@ bool GamePlayStage::collectDataToSend(std::string &str)
 	Position::Handle posH;
 	Rotation::Handle rotH;
 	isPlayer::Handle isPlayerH;
-	str = str + "#2;";
+	str = str + "$2;";
 	//std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
 	for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH))
 	{
 		//std::cout << "data collecting" << std::endl;
+		//std::cout << "position in SERWER:" << posH->pos.x << " " <<posH->pos.y << std::endl;
+		//posH->pos.x = posH->pos.x % 0.01;
+		if((posH->pos.x > 0.01 || posH->pos.x < -0.01) && (posH->pos.y > 0.01 || posH->pos.y < -0.01))
 		str = str + std::to_string(isPlayerH->id) + ";" + std::to_string(posH->pos.x) + ";" + std::to_string(posH->pos.y) + ";" + std::to_string(rotH->degree) + ";";
 	}
 	str = str + ";"; // to make ";;" (end of call)
@@ -243,6 +247,7 @@ bool GamePlayStage::updatePartsAction(unsigned int playersId, std::string & buff
 
 		}
 	}
+	(*ex_ptr).systems.update<engine_system>(dt);
 	return true;
 }
 
@@ -266,7 +271,7 @@ bool GamePlayStage::update(std::string &buffer)
 			
 		while(actionCode != "0")
 			{
-			//std::cout <<"buffer:" << buffer << std::endl;
+			//std::cout <<"buffer in while:" << buffer << std::endl;
 				actionCode = resource.decodeOneLineRead(buffer) != "" ? resource.decodeOneLineDel(buffer) : "0";
 				//
 				if (actionCode == "#1")
@@ -277,12 +282,13 @@ bool GamePlayStage::update(std::string &buffer)
 				else if (actionCode == "#2")
 				{
 					updatePartsAction(playersId, buffer);
+					//std::cout << "UPDATE PARTS ACTION" << std::endl;
 				}
 			}
 		(*phisics_ptr).update(dt);
 
 		
-		(*ex_ptr).systems.update<engine_system>(dt);
+		
 		//(*ex_ptr).systems.update<DestructionSystem>(dt);
 		//(*ex_ptr).systems.update<CraneSystem>(dt);
 		//(*ex_ptr).systems.update<platform_manager>(dt);
@@ -300,6 +306,7 @@ bool GamePlayStage::update(std::string &buffer)
 }
 bool GamePlayStage::release()
 {
+
 
 }
 GamePlayStage::~GamePlayStage()
