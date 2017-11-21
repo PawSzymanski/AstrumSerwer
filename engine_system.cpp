@@ -42,7 +42,6 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 			rotEngH = en2.component<Rotation>();
 			attachPointH = en2.component<AttachToPlayerPoint>();
 			rotEngH = en2.component<Rotation>();
-
 			transEngH->trans = transEngH->defaultTrans;
 
 			//std::cout << posH->pos.x << "  " << posH->pos.y << std::endl;
@@ -62,7 +61,7 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 			gunPart(en, en1, en2, ev, attachPointH, rotMatrix, rotEngH->degree);
 
 			//end;/////////////////////////////////////////////////////////////////////////////////////////
-			attachPointH->point = rotMatrix.getInverse() * attachPointH->point;		
+			attachPointH->point = rotMatrix.getInverse() * attachPointH->point;	
 		}
 	}
 }
@@ -70,11 +69,12 @@ void engine_system::update(entityx::EntityManager & en, entityx::EventManager & 
 void engine_system::enginePart(entityx::Entity enPlayer, entityx::Entity enPart, 
 	entityx::EventManager & ev, AttachToPlayerPoint::Handle attachPointH, sf::Transform rotMatrix, PartInfo::Handle partInfH)
 {
-	auto & resource = ResourcesManager::getInstanceRef();
 	if (!enPart.has_component<isEngine>())
 	{
 		return;
 	}
+	auto & resource = ResourcesManager::getInstanceRef();
+
 	KeyAssigned::Handle keyH;
 	ForcePoint::Handle pointH;
 	AdditionalAnim::Handle animH;
@@ -87,20 +87,6 @@ void engine_system::enginePart(entityx::Entity enPlayer, entityx::Entity enPart,
 	if (partInfH->isActive)
 	{	
 		ev.emit<ApplyForceEvent>(attachPointH->point, pointH->force, enPlayer);
-		
-		if (!enPart.has_component<AdditionalAnim>())
-		{
-		//	enPart.assign<AdditionalAnim>("fire", &(resource.textureCont.getTexture("fire")), resource.vertCont.getPoly("fire"), 10.0f, sf::Vector2f(0, 0.18));	
-		}
-		else
-		{
-		//	animH = enPart.component<AdditionalAnim>();
-		//	animH->animate = true;
-		}
-	}
-	else if (enPart.has_component<AdditionalAnim>())
-	{
-		enPart.remove<AdditionalAnim>();
 	}
 	pointH->force = rotMatrix.getInverse() * pointH->force;
 }

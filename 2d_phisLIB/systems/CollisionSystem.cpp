@@ -138,6 +138,14 @@ void CollisionSystem::ResolveCollision(Manifold &m, entityx::EventManager & ev, 
             temp_en1 = slave->master;
             //std::cout<<"SLAVEEEEEEE"<<std::endl;
         }
+		if (m.en1.has_component<isPlayer>())
+		{
+
+		}
+		else
+		{
+
+		}
         ev.emit<ApplyForceEvent>(contact2, m.force, temp_en2);
         ev.emit<ApplyForceEvent>(contact1, -m.force, temp_en1);
 	}

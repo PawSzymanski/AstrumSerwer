@@ -1,7 +1,7 @@
 #include "GameplayStage.h"
 
 
-GamePlayStage::GamePlayStage() :time(sf::Time::Zero), isWaitingForPlayers(true), isInit(false)
+GamePlayStage::GamePlayStage() :time(sf::Time::Zero), isWaitingForPlayers(true), isInit(false) ,dt(0.01)
 {
 }
 bool GamePlayStage::init(std::string &str)
@@ -30,7 +30,7 @@ bool GamePlayStage::init(std::string &str)
 
 	//loading players
 	int xPos = 1;
-	str = str + "$1;"; //action code
+	playersInfoStr = playersInfoStr + "$1;"; //action code
 	for (auto &p : player)
 	{
 		xPos += 2;
@@ -57,7 +57,7 @@ bool GamePlayStage::init(std::string &str)
 
 
 		//
-		str = str + std::to_string(p.uniqueId) + ";" + typeOfShip + ";" + std::to_string(xPos) + ";8; " + "0;";
+		playersInfoStr = playersInfoStr + std::to_string(p.uniqueId) + ";" + typeOfShip + ";" + std::to_string(xPos) + ";8; " + "0;";
 		//
 
 
@@ -146,17 +146,16 @@ bool GamePlayStage::init(std::string &str)
 		}
 		std::cout << "init" << std::endl;
 	}
-	str = str + ";";
+	playersInfoStr = playersInfoStr + ";";
 	std::cout << "init" << std::endl;
 	isInit = true;
-	system("pause");
+	//system("pause");
 }
 
 bool GamePlayStage::LoadPart(ResourcesManager::UniquePlayer player)
 {
 
 }
-
 
 bool GamePlayStage::isFull()
 {
@@ -198,22 +197,65 @@ bool GamePlayStage::collectDataToSend(std::string &str)
 	auto &resource = ResourcesManager::getInstanceRef();
 	Position::Handle posH;
 	Rotation::Handle rotH;
+	LinearVelocity::Handle linVelH;
 	isPlayer::Handle isPlayerH;
 	str = str + "$2;";
 	//std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
-	for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH))
+	for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH, linVelH))
 	{
 		//std::cout << "data collecting" << std::endl;
-		//std::cout << "position in SERWER:" << posH->pos.x << " " <<posH->pos.y << std::endl;
+		std::cout << "BEF position in SERWER:" << posH->pos.x << " " <<posH->pos.y << std::endl;
 		//posH->pos.x = posH->pos.x % 0.01;
-		if((posH->pos.x > 0.01 || posH->pos.x < -0.01) && (posH->pos.y > 0.01 || posH->pos.y < -0.01))
-		str = str + std::to_string(isPlayerH->id) + ";" + std::to_string(posH->pos.x) + ";" + std::to_string(posH->pos.y) + ";" + std::to_string(rotH->degree) + ";";
+		//if((posH->pos.x > 0.01 || posH->pos.x < -0.01) && (posH->pos.y > 0.01 || posH->pos.y < -0.01))
+		str = str + std::to_string(isPlayerH->id) + ";"
+			+ std::to_string(posH->pos.x) + ";" + std::to_string(posH->pos.y) + ";"
+			+ std::to_string(linVelH->vel.x) + ";" +std::to_string(linVelH->vel.y)+ ";"
+			+ std::to_string(rotH->degree) + ";";
 	}
 	str = str + ";"; // to make ";;" (end of call)
 	return true;
 }
-bool GamePlayStage::addVelocity(unsigned int playersId, std::string & bufferStr)
+/*
+Does all stuff needed after collision sended by player
+*/
+bool GamePlayStage::updateVelocity(unsigned int playersId, std::string & bufferStr)
 {
+	isPlayer::Handle playerH;
+	auto& resource = ResourcesManager::getInstanceRef();
+	//std::cout << "string:" << bufferStr << std::endl;
+	for (auto en : (*ex_ptr).entities.entities_with_components<>(playerH))
+	{
+		/////////////////////////////////////////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!poprawic
+		if (playerH->id == playersId) ///TU BARDZO ZLE VEEEEEEEERY BAAAD  IF "==" GOOD 
+		{
+			sf::Vector2f contact, force, pos;
+			Position::Handle posH = en.component<Position>();
+
+			contact.x = stof(resource.decodeOneLineDel(bufferStr));
+			contact.y = stof(resource.decodeOneLineDel(bufferStr));
+
+			force.x = stof(resource.decodeOneLineDel(bufferStr));
+			force.y = stof(resource.decodeOneLineDel(bufferStr));
+
+			if (force.y == 0.0f && force.x == 0.0f)
+			{
+				return false;
+			}
+			if (stof(resource.decodeOneLineRead(bufferStr)) != 0.0f &&
+				stof(resource.decodeOneLineRead(bufferStr)) != 0.0f)
+			{
+				//posH->pos.x = 
+					stof(resource.decodeOneLineDel(bufferStr));
+				//posH->pos.y = 
+					stof(resource.decodeOneLineDel(bufferStr));
+			}
+			(*ex_ptr).events.emit<ApplyForceEvent>(contact, force, en);
+			std::cout << "velocity updt: f:" << playersId <<"  "<<force.x << " " << force.y << "posAft:"<< posH->pos.x << posH->pos.y <<std::endl;
+			system("pause");
+			break;
+		}
+	}
+
 
 	return true;
 }
@@ -251,6 +293,13 @@ bool GamePlayStage::updatePartsAction(unsigned int playersId, std::string & buff
 	return true;
 }
 
+void GamePlayStage::addPlayersInfoToBuff(unsigned int playersId, std::string & buffer)
+{
+	//std::cout << "lpay info:" << playersInfoStr << std::endl;
+	//buffer.pop_back();
+	buffer = buffer + playersInfoStr;
+}
+
 bool GamePlayStage::update(std::string &buffer)
 {
 	//here messsage must look like this :
@@ -269,14 +318,14 @@ bool GamePlayStage::update(std::string &buffer)
 
 		resource.temporaryId = playersId;
 			
-		while(actionCode != "0")
+		while(!buffer.empty())
 			{
 			//std::cout <<"buffer in while:" << buffer << std::endl;
-				actionCode = resource.decodeOneLineRead(buffer) != "" ? resource.decodeOneLineDel(buffer) : "0";
+			actionCode = resource.decodeOneLineDel(buffer);// != "" ? resource.decodeOneLineDel(buffer) : "0";
 				//
 				if (actionCode == "#1")
 				{
-					addVelocity(playersId, buffer);
+					updateVelocity(playersId, buffer);
 				}
 				//
 				else if (actionCode == "#2")
@@ -284,11 +333,24 @@ bool GamePlayStage::update(std::string &buffer)
 					updatePartsAction(playersId, buffer);
 					//std::cout << "UPDATE PARTS ACTION" << std::endl;
 				}
+				//forcing players info sending
+				else if (actionCode == "#3")
+				{
+					addPlayersInfoToBuff(playersId, buffer);
+					break;
+				}
 			}
+		Position::Handle posH;
+		Rotation::Handle rotH;
+		LinearVelocity::Handle linVelH;
+		isPlayer::Handle isPlayerH;
+		//std::cout << "entities size:" << (*ex_ptr).entities.size() <<std::endl;
+		for (auto en : (*ex_ptr).entities.entities_with_components<>(posH, rotH, isPlayerH, linVelH))
+		{
+			std::cout << "AFTER position in SERWER:" << isPlayerH->id << "  " << posH->pos.x << " " << posH->pos.y << std::endl;
+		}
 		(*phisics_ptr).update(dt);
 
-		
-		
 		//(*ex_ptr).systems.update<DestructionSystem>(dt);
 		//(*ex_ptr).systems.update<CraneSystem>(dt);
 		//(*ex_ptr).systems.update<platform_manager>(dt);
@@ -306,7 +368,8 @@ bool GamePlayStage::update(std::string &buffer)
 }
 bool GamePlayStage::release()
 {
-
+	ex_ptr.reset();
+	phisics_ptr.reset();
 
 }
 GamePlayStage::~GamePlayStage()
